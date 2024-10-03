@@ -5,8 +5,8 @@ import retrofit2.Call
 import retrofit2.http.*
 
 interface ApiService {
-    @GET("events?active={param}")
-    fun getEvents(@Path("param") param: String): Call<EventResponse>
+    @GET("events")
+    fun getEvents(@Query("param") param: String): Call<EventResponse>
 
 //
 //    @GET("events={id}")
