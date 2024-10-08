@@ -7,4 +7,14 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_upcoming">Upcoming</string>
     <string name="title_finished">Finished</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse placerat augue id sem scelerisque, at blandit dolor iaculis. In volutpat vehicula magna a venenatis. Aliquam condimentum euismod nunc et fermentum. Praesent eros sem, vulputate non quam vitae, scelerisque luctus augue. Sed vel vehicula elit. Aliquam vitae erat non lectus iaculis vehicula. Aenean vel lorem egestas, consequat purus at, placerat lorem. Aliquam urna mi, gravida vitae tempus eget, rhoncus eget neque.</string>
+    <string name="register">Register</string>
+    <string name="image">Image</string>
+    <string name="event_title">Event Title</string>
+    <string name="event_owner_name">Event Owner Name</string>
+    <string name="event_summary">Event Summary</string>
+    <string name="sisa_kuota">Sisa Kuota:</string>
+    <string name="_1337">1337</string>
+    <string name="event_start">2024-10-11 17:00:00</string>
+    <string name="informasi">Informasi:</string>
 </resources>

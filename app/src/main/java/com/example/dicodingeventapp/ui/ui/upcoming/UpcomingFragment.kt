@@ -1,4 +1,4 @@
-package com.example.dicodingeventapp.ui.ui.home
+package com.example.dicodingeventapp.ui.ui.upcoming
 
 import android.os.Bundle
 import android.view.LayoutInflater
