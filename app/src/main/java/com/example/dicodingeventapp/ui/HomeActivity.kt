@@ -5,7 +5,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-//import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.dicodingeventapp.R
 import com.example.dicodingeventapp.databinding.ActivityHomeBinding
@@ -20,6 +20,8 @@ private lateinit var binding: ActivityHomeBinding
      binding = ActivityHomeBinding.inflate(layoutInflater)
      setContentView(binding.root)
 
+        setSupportActionBar(binding.upcomingToolbar)
+
         val navView: BottomNavigationView = binding.navView
 
         val navController = findNavController(R.id.nav_host_fragment_activity_home)
@@ -27,7 +29,10 @@ private lateinit var binding: ActivityHomeBinding
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(setOf(
             R.id.navigation_upcoming, R.id.navigation_finished))
-//        setupActionBarWithNavController(navController, appBarConfiguration)
+
+
+        setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
     }
 }
