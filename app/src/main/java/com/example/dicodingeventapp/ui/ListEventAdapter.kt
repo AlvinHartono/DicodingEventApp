@@ -3,14 +3,14 @@ package com.example.dicodingeventapp.ui
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dicodingeventapp.data.response.ListEventsItem
 import com.example.dicodingeventapp.databinding.ItemRowEventBinding
-import com.example.dicodingeventapp.ui.DetailEventActivity.Companion.EVENT_ITEM
+import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity.Companion.EVENT_ITEM
+import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity
 
 class ListEventAdapter :
     ListAdapter<ListEventsItem, ListEventAdapter.EventViewHolder>(DIFF_CALLBACK) {

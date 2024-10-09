@@ -10,7 +10,7 @@ interface ApiService {
     fun getEvents(@Query("param") param: String): Call<EventResponse>
 
     @GET("events/{id}")
-    fun getDetailEvent(@Path("id") id: String): Call<DetailEventResponse>
+    fun getDetailEvent(@Path("id") id: Int): Call<DetailEventResponse>
 
 //
 //    @GET("events={id}")
