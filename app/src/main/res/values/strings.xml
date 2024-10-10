@@ -25,4 +25,8 @@
     <string name="upcoming_events">Upcoming Events</string>
     <string name="search_bar_upcoming_event_hint">Cari event yang sedang berlangsung</string>
     <string name="search">Search</string>
+    <string name="image_logo">Image Logo</string>
+    <string name="events_that_have_finished">Events that have finished</string>
+    <string name="devcoach">Devcoach</string>
+    <string name="finished_events">Finished Events</string>
 </resources>

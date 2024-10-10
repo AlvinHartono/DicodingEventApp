@@ -31,7 +31,7 @@ class UpcomingViewModel : ViewModel() {
             return
         } else {
             _isLoading.value = true
-            val client = ApiConfig.getApiService().getEvents("0")
+            val client = ApiConfig.getApiService().getEvents("1")
             client.enqueue(object : Callback<EventResponse> {
                 override fun onResponse(
                     call: Call<EventResponse>,
@@ -54,5 +54,4 @@ class UpcomingViewModel : ViewModel() {
             })
         }
     }
-
 }

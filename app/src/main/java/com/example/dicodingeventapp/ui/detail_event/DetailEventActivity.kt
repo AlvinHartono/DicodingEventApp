@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.ViewModelProvider
@@ -81,12 +82,45 @@ class DetailEventActivity : AppCompatActivity() {
                     }
                 }
 
+                viewModel.isLoading.observe(this) {
+                    showLoading(it)
+                }
             }
         } else {
             // TODO Handle the case where dataEvent is null or id is null
         }
 
     }
+
+    private fun showLoading(isLoading: Boolean) {
+        if (isLoading) {
+            binding.progressBar.visibility = View.VISIBLE
+            binding.guidelineEventDetail.visibility = View.INVISIBLE
+            binding.tvEventNameDetail.visibility = View.INVISIBLE
+            binding.tvEventOwnerName.visibility = View.INVISIBLE
+            binding.tvEventSummary.visibility = View.INVISIBLE
+            binding.tvEventSisaKuota.visibility = View.INVISIBLE
+            binding.tvEventSisaKuotaNumber.visibility = View.INVISIBLE
+            binding.tvBeginTimeEvent.visibility = View.INVISIBLE
+            binding.tvEventDescription.visibility = View.INVISIBLE
+            binding.btnEventRegister.visibility = View.INVISIBLE
+            binding.imageEventMediaCover.visibility = View.INVISIBLE
+        } else {
+            binding.progressBar.visibility = View.GONE
+            binding.guidelineEventDetail.visibility = View.VISIBLE
+            binding.tvEventNameDetail.visibility = View.VISIBLE
+            binding.tvEventOwnerName.visibility = View.VISIBLE
+            binding.tvEventSummary.visibility = View.VISIBLE
+            binding.tvEventSisaKuota.visibility = View.VISIBLE
+            binding.tvEventSisaKuotaNumber.visibility = View.VISIBLE
+            binding.tvBeginTimeEvent.visibility = View.VISIBLE
+            binding.tvEventDescription.visibility = View.VISIBLE
+            binding.btnEventRegister.visibility = View.VISIBLE
+            binding.imageEventMediaCover.visibility = View.VISIBLE
+
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {

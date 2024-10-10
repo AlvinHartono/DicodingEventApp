@@ -1,21 +1,18 @@
 package com.example.dicodingeventapp.ui.ui.upcoming
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.dicodingeventapp.R
 import com.example.dicodingeventapp.data.response.ListEventsItem
 import com.example.dicodingeventapp.databinding.FragmentUpcomingBinding
-import com.example.dicodingeventapp.ui.ListEventAdapter
+import com.example.dicodingeventapp.ui.ui.search.SearchActivity
 
 class UpcomingFragment : Fragment() {
 
@@ -43,7 +40,7 @@ class UpcomingFragment : Fragment() {
         binding.rvEvent.addItemDecoration(itemDecoration)
 
 
-        // Set up NestedScrollView to Modify the scrolling
+        // Set up NestedScrollView to modify the scrolling
         binding.nestedScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { _, _, _, _, _ ->
             if (!binding.nestedScrollView.canScrollVertically(1)) {
                 // Enable RecyclerView scrolling when NestedScrollView can't scroll further
@@ -54,8 +51,10 @@ class UpcomingFragment : Fragment() {
             }
         })
         // Searchbar goes to SearchFragment when clicked
-        binding.searchBar.setOnClickListener{
+        binding.searchBar.setOnClickListener {
 //            TODO: make an intent to SearchActivity
+            val intent = Intent(requireContext(), SearchActivity::class.java)
+            startActivity(intent)
         }
 
         //observe ViewModel's LiveDatas
@@ -79,8 +78,8 @@ class UpcomingFragment : Fragment() {
 
     }
 
-    private fun setUpcomingEventsData(events: List<ListEventsItem?>?) {
-        val adapter = ListEventAdapter()
+        private fun setUpcomingEventsData(events: List<ListEventsItem?>?) {
+        val adapter = ListUpcomingEventAdapter()
         adapter.submitList(events)
         binding.rvEvent.adapter = adapter
     }

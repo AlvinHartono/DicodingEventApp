@@ -1,4 +1,4 @@
-package com.example.dicodingeventapp.ui
+package com.example.dicodingeventapp.ui.ui.upcoming
 
 import android.content.Intent
 import android.view.LayoutInflater
@@ -8,13 +8,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.dicodingeventapp.data.response.ListEventsItem
-import com.example.dicodingeventapp.databinding.ItemRowEventBinding
+import com.example.dicodingeventapp.databinding.ItemRowEventBBinding
 import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity.Companion.EVENT_ITEM
 import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity
 
-class ListEventAdapter :
-    ListAdapter<ListEventsItem, ListEventAdapter.EventViewHolder>(DIFF_CALLBACK) {
-    class EventViewHolder(private val binding: ItemRowEventBinding) :
+class ListUpcomingEventAdapter :
+    ListAdapter<ListEventsItem, ListUpcomingEventAdapter.EventViewHolder>(DIFF_CALLBACK) {
+    class EventViewHolder(private val binding: ItemRowEventBBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(event: ListEventsItem) {
             binding.tvEventName.text = event.name
@@ -27,7 +27,7 @@ class ListEventAdapter :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
         val binding =
-            ItemRowEventBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemRowEventBBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return EventViewHolder(binding)
     }
 
@@ -42,7 +42,6 @@ class ListEventAdapter :
             }
             holder.itemView.context.startActivity(intentDetailEvent)
         }
-
     }
 
     companion object {
@@ -61,8 +60,6 @@ class ListEventAdapter :
                 return oldItem == newItem
             }
         }
-
-
     }
 
 

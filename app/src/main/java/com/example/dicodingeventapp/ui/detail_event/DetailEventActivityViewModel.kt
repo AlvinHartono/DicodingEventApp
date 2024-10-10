@@ -20,17 +20,22 @@ class DetailEventActivityViewModel(private val eventId: Int) :
     private val _event = MutableLiveData<Event>()
     val event: LiveData<Event> = _event
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
     init {
         fetchEventDetails()
     }
 
     private fun fetchEventDetails() {
+        _isLoading.value = true
         val client = ApiConfig.getApiService().getDetailEvent(eventId)
         client.enqueue(object : Callback<DetailEventResponse> {
             override fun onResponse(
                 call: Call<DetailEventResponse>,
                 response: Response<DetailEventResponse>
             ) {
+                _isLoading.value = false
                 if (response.isSuccessful) {
                     val responseBody = response.body()
 
