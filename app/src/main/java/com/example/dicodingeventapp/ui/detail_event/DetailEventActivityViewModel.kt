@@ -50,7 +50,6 @@ class DetailEventActivityViewModel(private val eventId: Int) :
             override fun onFailure(call: Call<DetailEventResponse>, t: Throwable) {
                 Log.e(TAG, "onFailure: ${t.message}")
             }
-
         })
     }
 }

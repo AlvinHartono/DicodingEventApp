@@ -33,6 +33,7 @@
                 android:layout_marginTop="16dp"
                 android:contentDescription="@string/image"
                 android:scaleType="fitCenter"
+                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -46,6 +47,7 @@
                 android:text="@string/event_title"
                 android:textAlignment="center"
                 android:textSize="20sp"
+                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/image_event_media_cover" />
@@ -58,6 +60,7 @@
                 android:text="@string/event_owner_name"
                 android:textAlignment="center"
                 android:textSize="14sp"
+                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_event_name_detail" />
@@ -70,6 +73,7 @@
                 android:textAlignment="center"
                 android:textSize="16sp"
                 android:textStyle="italic"
+                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_event_owner_name" />
@@ -89,6 +93,7 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/sisa_kuota"
                 android:textStyle="bold"
+                android:visibility="invisible"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_event_summary" />
 
@@ -98,6 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/_1337"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@id/tv_event_sisa_kuota"
                 app:layout_constraintEnd_toStartOf="@id/guideline_event_detail"
                 app:layout_constraintStart_toEndOf="@id/tv_event_sisa_kuota"
@@ -111,6 +117,7 @@
                 android:layout_marginStart="16dp"
                 android:text="@string/event_start"
                 android:textStyle="bold"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="@id/tv_event_sisa_kuota_number"
                 app:layout_constraintStart_toStartOf="@id/guideline_event_detail"
                 app:layout_constraintTop_toTopOf="@id/tv_event_sisa_kuota_number" />
@@ -121,6 +128,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/lorem_ipsum"
+                android:visibility="invisible"
                 app:layout_constraintTop_toBottomOf="@+id/tv_begin_time_event" />
 
             <Button
@@ -131,6 +139,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="36dp"
                 android:text="@string/register"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -141,7 +150,7 @@
                 style="?android:attr/progressBarStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
