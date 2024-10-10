@@ -9,7 +9,7 @@ interface ApiService {
 
     // get events
     @GET("events")
-    fun getEvents(@Query("param") param: String): Call<EventResponse>
+    fun getEvents(@Query("active") active: Int = -1): Call<EventResponse>
 
     // get detail event
     @GET("events/{id}")
