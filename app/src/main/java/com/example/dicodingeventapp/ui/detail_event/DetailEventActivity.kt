@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.ViewModelProvider
@@ -34,7 +35,6 @@ class DetailEventActivity : AppCompatActivity() {
         // Extract event data from the Intent
         val dataEvent = if (Build.VERSION.SDK_INT >= 33) {
             intent.getParcelableExtra(EVENT_ITEM, ListEventsItem::class.java)
-
         } else {
             @Suppress("DEPRECATION")
             intent.getParcelableExtra(EVENT_ITEM)
@@ -84,6 +84,17 @@ class DetailEventActivity : AppCompatActivity() {
             }
         } else {
             // TODO Handle the case where dataEvent is null or id is null
+        }
+
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressedDispatcher.onBackPressed()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }
