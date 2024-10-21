@@ -1,55 +1,22 @@
 package com.example.dicodingeventapp.ui.detail_event
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.dicodingeventapp.data.response.DetailEventResponse
-import com.example.dicodingeventapp.data.response.Event
-import com.example.dicodingeventapp.data.retrofit.ApiConfig
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.dicodingeventapp.data.local.entity.Event
+import com.example.dicodingeventapp.repository.EventRepository
 
-class DetailEventActivityViewModel(private val eventId: Int) :
+class DetailEventActivityViewModel(private val eventRepository: EventRepository) :
     ViewModel() {
-    companion object {
-        private const val TAG = "DetailEvtActVM"
-    }
 
-    private val _event = MutableLiveData<Event>()
-    val event: LiveData<Event> = _event
+//    private val _event = MutableLiveData<Event>()
+//    val event: LiveData<Event> = _event
 
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
 
-    init {
-        fetchEventDetails()
-    }
+//    not using this function we will getting all the information from the intent
+//    val detailEvent = eventRepository.fetchDetailEvent(eventId)
 
-    private fun fetchEventDetails() {
-        _isLoading.value = true
-        val client = ApiConfig.getApiService().getDetailEvent(eventId)
-        client.enqueue(object : Callback<DetailEventResponse> {
-            override fun onResponse(
-                call: Call<DetailEventResponse>,
-                response: Response<DetailEventResponse>
-            ) {
-                _isLoading.value = false
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
 
-                    responseBody?.event?.let { event -> _event.postValue(event) } ?: run {
-                        Log.d(TAG, "onFailure: ${response.message()}")
-                    }
-                } else {
-                    Log.d(TAG, "onFailure: ${response.message()}")
-                }
-            }
+    fun deleteEvent(event: Event) = eventRepository.setFavoriteEvents(event, false)
 
-            override fun onFailure(call: Call<DetailEventResponse>, t: Throwable) {
-                Log.e(TAG, "onFailure: ${t.message}")
-            }
-        })
-    }
+    fun saveEvent(event: Event) = eventRepository.setFavoriteEvents(event, true)
+
 }

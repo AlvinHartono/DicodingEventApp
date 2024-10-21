@@ -1,52 +1,20 @@
 package com.example.dicodingeventapp.ui.ui.search
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.dicodingeventapp.data.response.EventResponse
-import com.example.dicodingeventapp.data.response.ListEventsItem
-import com.example.dicodingeventapp.data.retrofit.ApiConfig
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.dicodingeventapp.data.local.entity.Event
+import com.example.dicodingeventapp.repository.EventRepository
 
-class SearchViewModel : ViewModel() {
-    companion object {
-        private const val TAG = "SearchViewModel"
-    }
+class SearchViewModel(private val eventRepository: EventRepository) : ViewModel() {
 
-    private val _searchedEvents = MutableLiveData<List<ListEventsItem?>>()
-    val searchedEvents: LiveData<List<ListEventsItem?>> = _searchedEvents
+    private val _searchedEvents = MutableLiveData<List<Event?>>()
+    val searchedEvents: LiveData<List<Event?>> = _searchedEvents
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
 
-    fun fetchSearchedEvents(query: String) {
-        _isLoading.value = true
-
-        val client = ApiConfig.getApiService().findEvents(-1, query)
-        client.enqueue(object : Callback<EventResponse> {
-            override fun onResponse(
-                call: Call<EventResponse>,
-                response: Response<EventResponse>
-            ) {
-                _isLoading.value = false
-                if (response.isSuccessful) {
-                    val responseBody = response.body()
-                    if (responseBody != null) {
-                        _searchedEvents.value = response.body()!!.listEvents!!
-                    }
-                } else {
-                    Log.d(TAG, "onFailure: ${response.message()}")
-                }
-            }
-
-            override fun onFailure(call: Call<EventResponse>, t: Throwable) {
-                Log.e(TAG, "onFailure: ${t.message}")
-            }
-        })
-    }
+    fun fetchSearchResult(query: String) = eventRepository.fetchSearchResult(query)
 
 }

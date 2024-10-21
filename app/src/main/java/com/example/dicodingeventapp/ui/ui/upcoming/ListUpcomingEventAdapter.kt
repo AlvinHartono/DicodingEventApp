@@ -7,16 +7,17 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.dicodingeventapp.data.response.ListEventsItem
+import com.example.dicodingeventapp.R
+import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.ItemRowEventBBinding
-import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity.Companion.EVENT_ITEM
 import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity
+import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity.Companion.EVENT_ITEM
 
-class ListUpcomingEventAdapter :
-    ListAdapter<ListEventsItem, ListUpcomingEventAdapter.EventViewHolder>(DIFF_CALLBACK) {
-    class EventViewHolder(private val binding: ItemRowEventBBinding) :
+class ListUpcomingEventAdapter(private val onFavoriteClick: (Event) -> Unit) :
+    ListAdapter<Event, ListUpcomingEventAdapter.EventViewHolder>(DIFF_CALLBACK) {
+    class EventViewHolder(val binding: ItemRowEventBBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(event: ListEventsItem) {
+        fun bind(event: Event) {
             binding.tvEventName.text = event.name
             Glide.with(binding.imgEventMediaCover.context)
                 .load(event.mediaCover)
@@ -35,6 +36,17 @@ class ListUpcomingEventAdapter :
         val event = getItem(position)
 
         holder.bind(event)
+        val isFavorite = holder.binding.imgFavoriteB
+        if (event.isFavorite) {
+            isFavorite.setImageResource(R.drawable.ic_favorite)
+        } else {
+            isFavorite.setImageResource(R.drawable.ic_favorite_outline)
+        }
+
+        isFavorite.setOnClickListener {
+            onFavoriteClick(event)
+        }
+
         holder.itemView.setOnClickListener {
 
             val intentDetailEvent = Intent(holder.itemView.context, DetailEventActivity::class.java).apply {
@@ -45,17 +57,17 @@ class ListUpcomingEventAdapter :
     }
 
     companion object {
-        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListEventsItem>() {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Event>() {
             override fun areItemsTheSame(
-                oldItem: ListEventsItem,
-                newItem: ListEventsItem
+                oldItem: Event,
+                newItem: Event
             ): Boolean {
                 return oldItem == newItem
             }
 
             override fun areContentsTheSame(
-                oldItem: ListEventsItem,
-                newItem: ListEventsItem
+                oldItem: Event,
+                newItem: Event
             ): Boolean {
                 return oldItem == newItem
             }

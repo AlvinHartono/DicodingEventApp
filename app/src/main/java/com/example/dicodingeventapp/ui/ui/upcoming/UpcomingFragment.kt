@@ -10,7 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.dicodingeventapp.data.response.ListEventsItem
+import com.example.dicodingeventapp.data.Result
+import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.FragmentUpcomingBinding
 import com.example.dicodingeventapp.ui.ui.search.SearchActivity
 
@@ -18,7 +19,9 @@ class UpcomingFragment : Fragment() {
 
 
     private var _binding: FragmentUpcomingBinding? = null
-    private val upcomingViewModel by viewModels<UpcomingViewModel>()
+    private val upcomingViewModel by viewModels<UpcomingViewModel>{
+        UpcomingViewModelFactory.getInstance(requireActivity())
+    }
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -58,8 +61,19 @@ class UpcomingFragment : Fragment() {
         }
 
         //observe ViewModel's LiveDatas
-        upcomingViewModel.upcomingEvents.observe(viewLifecycleOwner) { events ->
-            setUpcomingEventsData(events)
+        upcomingViewModel.fetchUpcomingEvents().observe(viewLifecycleOwner) { result ->
+            if (result != null){
+                when (result) {
+                    is Result.Error -> TODO()
+                    is Result.Loading -> {
+                        showLoading(true)
+                    }
+                    is Result.Success ->{
+                        showLoading(false)
+                        setUpcomingEventsData(result.data)
+                    }
+                }
+            }
         }
 
         upcomingViewModel.isLoading.observe(viewLifecycleOwner) {
@@ -78,8 +92,14 @@ class UpcomingFragment : Fragment() {
 
     }
 
-        private fun setUpcomingEventsData(events: List<ListEventsItem?>?) {
-        val adapter = ListUpcomingEventAdapter()
+        private fun setUpcomingEventsData(events: List<Event?>?) {
+        val adapter = ListUpcomingEventAdapter{
+            if (it.isFavorite){
+                upcomingViewModel.deleteEvent(it)
+            }else{
+                upcomingViewModel.saveEvent(it)
+            }
+        }
         adapter.submitList(events)
         binding.rvEvent.adapter = adapter
     }

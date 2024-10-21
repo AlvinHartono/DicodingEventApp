@@ -7,18 +7,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.dicodingeventapp.data.response.ListEventsItem
+import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.ItemRowEventSearchBinding
 import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity
 import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity.Companion.EVENT_ITEM
 
 class ListSearchEventAdapter :
-    ListAdapter<ListEventsItem, ListSearchEventAdapter.SearchEventViewHolder>(DIFF_CALLBACK) {
+    ListAdapter<Event, ListSearchEventAdapter.SearchEventViewHolder>(DIFF_CALLBACK) {
 
     // ViewHolder
     class SearchEventViewHolder(private val binding: ItemRowEventSearchBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(event: ListEventsItem) {
+        fun bind(event: Event) {
             binding.eventNameSearch.text = event.name
 
             Glide.with(binding.imgEventImageLogo.context)
@@ -53,17 +53,17 @@ class ListSearchEventAdapter :
 
     // DiffUtil
     companion object {
-        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListEventsItem>() {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Event>() {
             override fun areItemsTheSame(
-                oldItem: ListEventsItem,
-                newItem: ListEventsItem
+                oldItem: Event,
+                newItem: Event
             ): Boolean {
                 return oldItem == newItem
             }
 
             override fun areContentsTheSame(
-                oldItem: ListEventsItem,
-                newItem: ListEventsItem
+                oldItem: Event,
+                newItem: Event
             ): Boolean {
                 return oldItem == newItem
             }

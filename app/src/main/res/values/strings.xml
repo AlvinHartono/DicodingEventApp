@@ -29,4 +29,6 @@
     <string name="events_that_have_finished">Events that have finished</string>
     <string name="devcoach">Devcoach</string>
     <string name="finished_events">Finished Events</string>
+    <string name="favorite_event">Favorite Event</string>
+    <string name="favorite">Favorite</string>
 </resources>

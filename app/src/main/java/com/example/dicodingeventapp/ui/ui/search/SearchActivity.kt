@@ -8,13 +8,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.dicodingeventapp.data.response.ListEventsItem
+import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.ActivitySearchBinding
 
 class SearchActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySearchBinding
-    private val searchViewModel by viewModels<SearchViewModel>()
+    private val searchViewModel by viewModels<SearchViewModel>{
+        SearchViewModelFactory.getInstance(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +50,7 @@ class SearchActivity : AppCompatActivity() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
-                    searchViewModel.fetchSearchedEvents(it)
+                    searchViewModel.fetchSearchResult(it)
                     binding.searchView.clearFocus()
                 }
                 return true
@@ -82,7 +84,7 @@ class SearchActivity : AppCompatActivity() {
 
     }
     // Give List of Events to Adapter
-    private fun setSearchEventsData(events: List<ListEventsItem?>?) {
+    private fun setSearchEventsData(events: List<Event?>?) {
         val adapter = ListSearchEventAdapter()
         adapter.submitList(events)
         binding.recyclerViewSearch.adapter = adapter
