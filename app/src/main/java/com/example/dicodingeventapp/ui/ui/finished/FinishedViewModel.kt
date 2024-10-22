@@ -21,8 +21,5 @@ class FinishedViewModel(private val eventRepository: EventRepository) : ViewMode
 
     fun saveEvent(event: Event) = eventRepository.setFavoriteEvents(event, true)
 
-
     fun deleteEvent(event: Event) = eventRepository.setFavoriteEvents(event, false)
-
-
 }
