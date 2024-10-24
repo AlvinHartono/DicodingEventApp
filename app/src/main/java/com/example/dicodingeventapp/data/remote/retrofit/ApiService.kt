@@ -1,31 +1,21 @@
 package com.example.dicodingeventapp.data.remote.retrofit
 
-import com.example.dicodingeventapp.data.remote.response.DetailEventResponse
 import com.example.dicodingeventapp.data.remote.response.EventResponse
-import retrofit2.Call
-import retrofit2.http.*
+import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface ApiService {
 
     // get events
     @GET("events")
-    fun getEvents(@Query("active") active: Int = -1): Call<EventResponse>
-
-    // get detail event
-    @GET("events/{id}")
-    fun getDetailEvent(@Path("id") id: Int): Call<DetailEventResponse>
+    suspend fun fetchEvents(@Query("active") active: Int = -1): EventResponse
 
     // get search event
     @GET("events")
-    fun findEvents(
+    suspend fun findEvents(
         @Query("active") active: Int = -1,
         @Query("q") keyword: String = "",
         @Query("limit") limit: Int = 40
-    ): Call<EventResponse>
+    ): EventResponse
 
-
-
-//
-//    @GET("events={id}")
-//    fun getEvent(@Path("id") id: String): Call<EventResponse>
 }

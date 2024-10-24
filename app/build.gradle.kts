@@ -47,7 +47,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation (libs.androidx.activity.ktx)
+    implementation(libs.androidx.activity.ktx)
 
     implementation(libs.kotlin.stdlib)
     ksp(libs.symbol.processing.api)
@@ -66,8 +66,10 @@ dependencies {
 
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime)
 
     implementation(libs.androidx.room.runtime)
+    implementation (libs.androidx.room.ktx)
     ksp(libs.room.compiler)
 
     implementation(libs.androidx.navigation.fragment.ktx)
@@ -75,6 +77,9 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.glide)
     implementation(libs.androidx.legacy.support.v4)
+
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.android.async.http)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

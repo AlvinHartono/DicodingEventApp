@@ -1,8 +1,11 @@
 package com.example.dicodingeventapp.ui.detail_event
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.repository.EventRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class DetailEventActivityViewModel(private val eventRepository: EventRepository) :
     ViewModel() {
@@ -15,8 +18,17 @@ class DetailEventActivityViewModel(private val eventRepository: EventRepository)
 //    val detailEvent = eventRepository.fetchDetailEvent(eventId)
 
 
-    fun deleteEvent(event: Event) = eventRepository.setFavoriteEvents(event, false)
+    suspend fun deleteEvent(event: Event) {
+        viewModelScope.launch(Dispatchers.IO) {
+            eventRepository.setFavoriteEvents(event, false)
+        }
+    }
 
-    fun saveEvent(event: Event) = eventRepository.setFavoriteEvents(event, true)
+    suspend fun saveEvent(event: Event) {
+        viewModelScope.launch(Dispatchers.IO) {
+            eventRepository.setFavoriteEvents(event, true)
+        }
+
+    }
 
 }

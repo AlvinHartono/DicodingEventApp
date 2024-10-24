@@ -7,282 +7,203 @@ import androidx.lifecycle.MutableLiveData
 import com.example.dicodingeventapp.data.Result
 import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.data.local.room.EventDao
-import com.example.dicodingeventapp.data.remote.response.EventResponse
 import com.example.dicodingeventapp.data.remote.retrofit.ApiService
-import com.example.dicodingeventapp.utils.AppExecutors
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
+
 
 class EventRepository private constructor(
     private val apiService: ApiService,
     private val eventDao: EventDao,
-    private val appExecutors: AppExecutors
 ) {
-
-
-//    // get all event
-//    fun getAllEvents() = mEventDao.getAllEvents()
-//
-//    // insert event
-//    fun insert(event: Event) {
-//        executorService.execute { mEventDao.insertEvent(event) }
-//    }
-//
-//    // update event
-//    fun update(event: Event) {
-//        executorService.execute { mEventDao.update(event) }
-//    }
-//
-//    // delete event
-//    fun delete(event: Event) {
-//        executorService.execute { mEventDao.delete(event) }
-//    }
-//
-//    // get favorite event
-//    fun getFavoriteEvents() = mEventDao.getFavoriteEvents()
-
 
     private val finishedResult = MediatorLiveData<Result<List<Event>>>()
     private val upcomingResult = MediatorLiveData<Result<List<Event>>>()
     private val searchResult = MediatorLiveData<Result<List<Event>>>()
-    private val detailResult = MediatorLiveData<Result<Event>>()
-
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
 
     // fetch finished events data from the api
-    fun fetchFinishedEvents(): MutableLiveData<Result<List<Event>>> {
-        finishedResult.value = Result.Loading
-        val client = apiService.getEvents(active = FINISHED_EVENTS)
-        client.enqueue(object : Callback<EventResponse> {
-            override fun onResponse(call: Call<EventResponse>, response: Response<EventResponse>) {
-                if (response.isSuccessful) {
-                    val events = response.body()?.listEvents
-                    val eventList = ArrayList<Event>()
-                    appExecutors.diskIO.execute {
-                        events?.forEach { event ->
-                            val isFavorite = eventDao.isEventFavorite(event?.id)
-                            val eventEntity =
-                                Event(
-                                    name = event?.name ?: "",
-                                    id = event?.id ?: 0,
-                                    summary = event?.summary ?: "",
-                                    mediaCover = event?.mediaCover ?: "",
-                                    registrants = event?.registrants ?: 0,
-                                    imageLogo = event?.imageLogo ?: "",
-                                    link = event?.link ?: "",
-                                    description = event?.description ?: "",
-                                    ownerName = event?.ownerName ?: "",
-                                    cityName = event?.cityName ?: "",
-                                    quota = event?.quota ?: 0,
-                                    beginTime = event?.beginTime ?: "",
-                                    endTime = event?.endTime ?: "",
-                                    category = event?.category ?: "",
-                                    isFavorite = isFavorite,
-                                    isActive = false
-                                )
-                            eventList.add(eventEntity)
-                        }
-                        eventDao.deleteAllFinishedEvent()
-                        eventDao.insertEvents(eventList)
-                    }
-                    Log.d("EventRepository", "Success, onResponse: $eventList")
+    suspend fun fetchFinishedEvents(): MutableLiveData<Result<List<Event>>> {
+        Log.d("EventRepository", "Fetching finished events...")
+        finishedResult.postValue(Result.Loading)
+
+        try {
+            Log.d("EventRepository", "Fetching finished events from API...")
+            val response = apiService.fetchEvents(FINISHED_EVENTS)
+            val events = response.listEvents
+            Log.d(
+                "EventRepository",
+                "Finished events fetched from API: ${events?.size} and has data? ${!events.isNullOrEmpty()}"
+            )
+
+            if (!events.isNullOrEmpty()) {
+                val eventList = ArrayList<Event>()
+                events.forEach { event ->
+                    Log.d("EventRepository", "Processing event: ${event?.name}")
+                    val isFavorite = eventDao.isEventFavorite(event?.id)
+
+                    val eventEntity = Event(
+                        name = event?.name ?: "",
+                        id = event?.id ?: 0,
+                        summary = event?.summary ?: "",
+                        mediaCover = event?.mediaCover ?: "",
+                        registrants = event?.registrants ?: 0,
+                        imageLogo = event?.imageLogo ?: "",
+                        link = event?.link ?: "",
+                        description = event?.description ?: "",
+                        ownerName = event?.ownerName ?: "",
+                        cityName = event?.cityName ?: "",
+                        quota = event?.quota ?: 0,
+                        beginTime = event?.beginTime ?: "",
+                        endTime = event?.endTime ?: "",
+                        category = event?.category ?: "",
+                        isFavorite = isFavorite,
+                        isActive = false,
+                    )
+
+                    Log.d("EventRepository", "Event added to list: ${eventEntity.id}")
+                    eventList.add(eventEntity)
+                    Log.d("EventRepository", "Finished Event list size: ${eventList.size}")
                 }
+                eventDao.insertEvents(eventList)
+                Log.d("EventRepository", "Events inserted into local DB")
+                finishedResult.postValue(Result.Success(eventList))
+            } else {
+                finishedResult.postValue(Result.Error("No events found"))
             }
-
-            override fun onFailure(call: Call<EventResponse>, t: Throwable) {
-                finishedResult.value = Result.Error(t.message.toString())
-            }
-        })
-
-        val localData = eventDao.getAllEvents()
-        finishedResult.addSource(localData) { newData: List<Event> ->
-            val finishedEvents = newData.filter { event ->
-                val eventBeginTime = SimpleDateFormat(
-                    "yyyy-MM-dd HH:mm:ss",
-                    Locale.getDefault()
-                ).parse(event.beginTime)
-                eventBeginTime?.let {
-                    it.time < System.currentTimeMillis() // Event has finished
-                } ?: false
-            }
-            finishedResult.value = Result.Success(finishedEvents)
+        } catch (e: Exception) {
+            finishedResult.postValue(Result.Error("Failed to fetch finished events: ${e.message}"))
         }
         return finishedResult
     }
 
     // fetch upcoming events from the api
-    fun fetchUpcomingEvents(): LiveData<Result<List<Event>>> {
-        upcomingResult.value = Result.Loading
-        val client = apiService.getEvents(active = UPCOMING_EVENTS)
+    suspend fun fetchUpcomingEvents(): MutableLiveData<Result<List<Event>>> {
+        Log.d("EventRepository", "Fetching upcoming events...")
+        upcomingResult.postValue(Result.Loading)
+        try {
+            Log.d("EventRepository", "Fetching upcoming events from API...")
+            val response = apiService.fetchEvents(UPCOMING_EVENTS)
+            val events = response.listEvents
+            Log.d(
+                "EventRepository",
+                "Upcoming events fetched from API: ${events?.size} and has data? ${!events.isNullOrEmpty()}"
+            )
 
-        client.enqueue(object : Callback<EventResponse> {
-            override fun onResponse(call: Call<EventResponse>, response: Response<EventResponse>) {
-                if (response.isSuccessful) {
-                    val events = response.body()?.listEvents
-                    val eventList = ArrayList<Event>()
-                    appExecutors.diskIO.execute {
-                        events?.forEach { event ->
-                            val isFavorite = eventDao.isEventFavorite(event?.id)
-                            val eventEntity =
-                                Event(
-                                    name = event?.name ?: "",
-                                    id = event?.id ?: 0,
-                                    summary = event?.summary ?: "",
-                                    mediaCover = event?.mediaCover ?: "",
-                                    registrants = event?.registrants ?: 0,
-                                    imageLogo = event?.imageLogo ?: "",
-                                    link = event?.link ?: "",
-                                    description = event?.description ?: "",
-                                    ownerName = event?.ownerName ?: "",
-                                    cityName = event?.cityName ?: "",
-                                    quota = event?.quota ?: 0,
-                                    beginTime = event?.beginTime ?: "",
-                                    endTime = event?.endTime ?: "",
-                                    category = event?.category ?: "",
-                                    isFavorite = isFavorite,
-                                    isActive = true,
-                                )
-                            eventList.add(eventEntity)
-                        }
-                        eventDao.deleteAllUpcomingEvent()
-                        eventDao.insertEvents(eventList)
-                    }
-                    Log.d("EventRepository", "Success, onResponse: $eventList")
+            if (!events.isNullOrEmpty()) {
+                val eventList = ArrayList<Event>()
+                events.forEach { event ->
+                    Log.d("EventRepository", "Processing event: ${event?.name}")
+                    val isFavorite = eventDao.isEventFavorite(event?.id)
+
+                    val eventEntity = Event(
+                        name = event?.name ?: "",
+                        id = event?.id ?: 0,
+                        summary = event?.summary ?: "",
+                        mediaCover = event?.mediaCover ?: "",
+                        registrants = event?.registrants ?: 0,
+                        imageLogo = event?.imageLogo ?: "",
+                        link = event?.link ?: "",
+                        description = event?.description ?: "",
+                        ownerName = event?.ownerName ?: "",
+                        cityName = event?.cityName ?: "",
+                        quota = event?.quota ?: 0,
+                        beginTime = event?.beginTime ?: "",
+                        endTime = event?.endTime ?: "",
+                        category = event?.category ?: "",
+                        isFavorite = isFavorite,
+                        isActive = true
+                    )
+
+                    Log.d("EventRepository", "Event added to list: ${eventEntity.id}")
+
+                    eventList.add(eventEntity)
+                    Log.d("EventRepository", "Event list size: ${eventList.size}")
                 }
+
+                // Insert into local DB and observe local data
+                eventDao.insertEvents(eventList)
+                Log.d("EventRepository", "Events inserted into local DB")
+
+
+                upcomingResult.postValue(Result.Success(eventList))
+
+            } else {
+                // Handle case when event list is empty or null
+                upcomingResult.postValue(Result.Error("No events found"))
+                Log.d("EventRepository", "No events found")
             }
 
-            override fun onFailure(call: Call<EventResponse>, t: Throwable) {
-                upcomingResult.value = Result.Error(t.message.toString())
-            }
-
-        })
-        val localData = eventDao.getAllEvents()
-        upcomingResult.addSource(localData) { newData: List<Event> ->
-            val upcomingEvents = newData.filter { event ->
-                val eventBeginTime = SimpleDateFormat(
-                    "yyyy-MM-dd HH:mm:ss",
-                    Locale.getDefault()
-                ).parse(event.beginTime)
-                eventBeginTime?.let {
-                    it.time > System.currentTimeMillis() // Event has not started yet
-                } ?: false
-            }
-            upcomingResult.value = Result.Success(upcomingEvents)
+        } catch (e: Exception) {
+            // Post the error result in case of an exception
+            upcomingResult.postValue(Result.Error("Failed to fetch upcoming events: ${e.message}"))
         }
+
         return upcomingResult
     }
 
+
     // fetch the search result from the api
-    fun fetchSearchResult(query: String): LiveData<Result<List<Event>>> {
-        finishedResult.value = Result.Loading
-        val client = apiService.findEvents(active = ALL_EVENTS, query)
-
-        client.enqueue(object : Callback<EventResponse> {
-            override fun onResponse(call: Call<EventResponse>, response: Response<EventResponse>) {
-                if (response.isSuccessful) {
-                    val events = response.body()?.listEvents
-                    val eventList = ArrayList<Event>()
-                    appExecutors.diskIO.execute {
-                        events?.forEach { event ->
-                            val isFavorite = eventDao.isEventFavorite(event?.id)
-                            val eventEntity =
-                                Event(
-                                    name = event?.name ?: "",
-                                    id = event?.id ?: 0,
-                                    summary = event?.summary ?: "",
-                                    mediaCover = event?.mediaCover ?: "",
-                                    registrants = event?.registrants ?: 0,
-                                    imageLogo = event?.imageLogo ?: "",
-                                    link = event?.link ?: "",
-                                    description = event?.description ?: "",
-                                    ownerName = event?.ownerName ?: "",
-                                    cityName = event?.cityName ?: "",
-                                    quota = event?.quota ?: 0,
-                                    beginTime = event?.beginTime ?: "",
-                                    endTime = event?.endTime ?: "",
-                                    category = event?.category ?: "",
-                                    isFavorite = isFavorite,
-                                    isActive = true,
-                                )
-                            eventList.add(eventEntity)
-                        }
-                        eventDao.insertEvents(eventList)
-                    }
-                    searchResult.value = Result.Success(eventList)
-                } else {
-                    searchResult.value = Result.Error(response.message())
-                }
+    suspend fun fetchSearchResult(query: String): MutableLiveData<Result<List<Event>>> {
+        searchResult.value = Result.Loading
+        val response = apiService.findEvents(ALL_EVENTS, query)
+        val events = response.listEvents
+        val eventList = ArrayList<Event>()
+        if (events!!.isNotEmpty()) {
+            events.forEach { event ->
+                val isFavorite = eventDao.isEventFavorite(event?.id)
+                val eventEntity = Event(
+                    name = event?.name ?: "",
+                    id = event?.id ?: 0,
+                    summary = event?.summary ?: "",
+                    mediaCover = event?.mediaCover ?: "",
+                    registrants = event?.registrants ?: 0,
+                    imageLogo = event?.imageLogo ?: "",
+                    link = event?.link ?: "",
+                    description = event?.description ?: "",
+                    ownerName = event?.ownerName ?: "",
+                    cityName = event?.cityName ?: "",
+                    quota = event?.quota ?: 0,
+                    beginTime = event?.beginTime ?: "",
+                    endTime = event?.endTime ?: "",
+                    category = event?.category ?: "",
+                    isFavorite = isFavorite,
+                    isActive = isEventActive(event?.beginTime),
+                )
+                eventList.add(eventEntity)
+                searchResult.value = Result.Success(eventList)
             }
-
-            override fun onFailure(call: Call<EventResponse>, t: Throwable) {
-                searchResult.value = Result.Error(t.message.toString())
-            }
-        })
+        }
 
         return searchResult
     }
 
-//    fun fetchDetailEvent(eventId: Int): LiveData<Result<Event>> {
-//        detailResult.value = Result.Loading
-//        val client = apiService.getDetailEvent(eventId)
-//        client.enqueue(object : Callback<DetailEventResponse> {
-//            override fun onResponse(
-//                call: Call<DetailEventResponse>,
-//                response: Response<DetailEventResponse>
-//            ) {
-//                if (response.isSuccessful) {
-//                    val event = response.body()?.event
-//                    val isFavorite = eventDao.isEventFavorite(event?.id)
-//                    val eventEntity = Event(
-//                        name = event?.name ?: "",
-//                        id = event?.id ?: 0,
-//                        summary = event?.summary ?: "",
-//                        mediaCover = event?.mediaCover ?: "",
-//                        registrants = event?.registrants ?: 0,
-//                        imageLogo = event?.imageLogo ?: "",
-//                        link = event?.link ?: "",
-//                        description = event?.description ?: "",
-//                        ownerName = event?.ownerName ?: "",
-//                        cityName = event?.cityName ?: "",
-//                        quota = event?.quota ?: 0,
-//                        beginTime = event?.beginTime ?: "",
-//                        endTime = event?.endTime ?: "",
-//                        category = event?.category ?: "",
-//                        isFavorite = isFavorite,
-//                        isActive = (event?.beginTime?.let {
-//                            dateFormat.parse(it)?.time ?: 0L
-//                        } ?: 0L) < System.currentTimeMillis(),
-//                    )
-//                    detailResult.value = Result.Success(eventEntity)
-//
-//                } else {
-//                    detailResult.value = Result.Error(response.message())
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<DetailEventResponse>, t: Throwable) {
-//                detailResult.value = Result.Error(t.message.toString())
-//            }
-//
-//        })
-//        return detailResult
-//    }
 
     fun getFavoriteEvents(): LiveData<List<Event>> {
         return eventDao.getFavoriteEvents()
     }
 
-    fun setFavoriteEvents(event: Event, eventState: Boolean) {
-        appExecutors.diskIO.execute {
-            event.isFavorite = eventState
-            eventDao.update(event)
-        }
+
+    suspend fun setFavoriteEvents(event: Event, eventState: Boolean) {
+        event.isFavorite = eventState
+        eventDao.update(event)
     }
 
+
+    private fun isEventActive(beginTime: String?): Boolean {
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+
+        return try {
+            val eventDate = beginTime?.let { format.parse(it) }
+
+            val currentDate = Date()
+
+            eventDate?.after(currentDate) == true
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     companion object {
         private const val FINISHED_EVENTS = 0
@@ -294,10 +215,9 @@ class EventRepository private constructor(
         fun getInstance(
             apiService: ApiService,
             eventDao: EventDao,
-            appExecutors: AppExecutors
         ): EventRepository =
             instance ?: synchronized(this) {
-                instance ?: EventRepository(apiService, eventDao, appExecutors)
+                instance ?: EventRepository(apiService, eventDao)
 
             }.also { instance = it }
     }

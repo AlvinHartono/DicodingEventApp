@@ -13,25 +13,26 @@ interface EventDao {
 
     //insert events
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertEvents(event: ArrayList<Event>)
+    suspend fun insertEvents(event: ArrayList<Event>)
 
     @Update
-    fun update(note: Event)
+    suspend fun update(note: Event)
 
     @Query("SELECT * FROM event WHERE isFavorite = 1")
     fun getFavoriteEvents(): LiveData<List<Event>>
 
-    @Query("SELECT * FROM event ORDER BY id ASC")
-    fun getAllEvents(): LiveData<List<Event>>
+    //get finished events
+    @Query("SELECT * FROM event WHERE isActive = 0")
+    fun getFinishedEvents(): LiveData<List<Event>>
 
     @Query("SELECT EXISTS(SELECT * FROM event WHERE id = :id AND isFavorite = 1)")
-    fun isEventFavorite(id: Int?): Boolean
+    suspend fun isEventFavorite(id: Int?): Boolean
 
     // delete upcoming events that is not favorite
     @Query("DELETE FROM event WHERE isFavorite = 0 AND isActive = 1")
-    fun deleteAllUpcomingEvent()
+    suspend fun deleteAllUpcomingEvent()
 
     // delete finished events that is not favorite
     @Query("DELETE FROM event WHERE isFavorite = 0 AND isActive = 0")
-    fun deleteAllFinishedEvent()
+    suspend fun deleteAllFinishedEvent()
 }

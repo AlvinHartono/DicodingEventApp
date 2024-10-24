@@ -2,9 +2,11 @@ package com.example.dicodingeventapp.ui.ui.upcoming
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,18 +16,19 @@ import com.example.dicodingeventapp.data.Result
 import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.FragmentUpcomingBinding
 import com.example.dicodingeventapp.ui.ui.search.SearchActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class UpcomingFragment : Fragment() {
 
 
     private var _binding: FragmentUpcomingBinding? = null
-    private val upcomingViewModel by viewModels<UpcomingViewModel>{
+    private val binding get() = _binding!!
+
+    private val upcomingViewModel by viewModels<UpcomingViewModel> {
         UpcomingViewModelFactory.getInstance(requireActivity())
     }
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,24 +63,26 @@ class UpcomingFragment : Fragment() {
             startActivity(intent)
         }
 
-        //observe ViewModel's LiveDatas
-        upcomingViewModel.fetchUpcomingEvents().observe(viewLifecycleOwner) { result ->
-            if (result != null){
-                when (result) {
-                    is Result.Error -> TODO()
-                    is Result.Loading -> {
-                        showLoading(true)
-                    }
-                    is Result.Success ->{
-                        showLoading(false)
-                        setUpcomingEventsData(result.data)
-                    }
+        //observe ViewModel's LiveData
+        upcomingViewModel.upcomingEvents.observe(viewLifecycleOwner) { result ->
+
+            Log.d("UpcomingFragment", "Result: $result")
+            when (result) {
+                is Result.Error -> showError(result.error)
+                is Result.Loading -> showLoading(true)
+                is Result.Success -> {
+                    showLoading(false)
+                    setUpcomingEventsData(result.data)
                 }
             }
         }
 
-        upcomingViewModel.isLoading.observe(viewLifecycleOwner) {
-            showLoading(it)
+        upcomingViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            showLoading(isLoading)
+        }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            upcomingViewModel.fetchUpcomingEvents()
         }
 
         return root
@@ -92,11 +97,17 @@ class UpcomingFragment : Fragment() {
 
     }
 
-        private fun setUpcomingEventsData(events: List<Event?>?) {
-        val adapter = ListUpcomingEventAdapter{
-            if (it.isFavorite){
+    private fun showError(message: String) {
+        // Handle error display, e.g., with a Toast or Snack bar
+        Toast.makeText(requireContext(), "Error: $message", Toast.LENGTH_SHORT).show()
+        Log.e("UpcomingFragment", "Error: $message")
+    }
+
+    private fun setUpcomingEventsData(events: List<Event?>?) {
+        val adapter = ListUpcomingEventAdapter {
+            if (it.isFavorite) {
                 upcomingViewModel.deleteEvent(it)
-            }else{
+            } else {
                 upcomingViewModel.saveEvent(it)
             }
         }

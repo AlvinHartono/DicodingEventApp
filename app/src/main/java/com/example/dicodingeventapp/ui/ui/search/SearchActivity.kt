@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.dicodingeventapp.data.Result
 import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.ActivitySearchBinding
 
@@ -43,7 +44,14 @@ class SearchActivity : AppCompatActivity() {
 
         // Observe searched events
         searchViewModel.searchedEvents.observe(this) { events ->
-            setSearchEventsData(events)
+            when (events) {
+                is Result.Error -> TODO()
+                Result.Loading -> showLoading(true)
+                is Result.Success -> {
+                    showLoading(false)
+                    setSearchEventsData(events.data)
+                }
+            }
         }
 
         // Set up SearchView and fetch Events

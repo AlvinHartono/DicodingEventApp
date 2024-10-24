@@ -13,10 +13,6 @@ class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,16 +27,22 @@ class SettingsFragment : Fragment() {
 
 
         settingsViewModel.getThemeSetting().observe(requireActivity()) { isDarkModeActive: Boolean ->
-            if (isDarkModeActive){
-                binding.switchTheme.isChecked = true
-            } else {
-                binding.switchTheme.isChecked = false
-            }
+            binding.switchTheme.isChecked = isDarkModeActive
         }
 
         // theme
         binding.switchTheme.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
             settingsViewModel.saveThemeSetting(isChecked)
+        }
+
+
+        settingsViewModel.getNotificationSetting().observe(viewLifecycleOwner) { isNotificationEnabled ->
+            binding.switchDailyReminder.isChecked = isNotificationEnabled
+        }
+
+        // Notification
+        binding.switchDailyReminder.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->
+            settingsViewModel.saveNotificationSetting(isChecked)
         }
 
         return root

@@ -10,6 +10,9 @@ import com.bumptech.glide.Glide
 import com.example.dicodingeventapp.R
 import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.ActivityDetailEventBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class DetailEventActivity : AppCompatActivity() {
 
@@ -61,12 +64,15 @@ class DetailEventActivity : AppCompatActivity() {
 
 
         binding.fabFavorite.setOnClickListener {
-            if (dataEvent.isFavorite) {
-                binding.fabFavorite.setImageResource(R.drawable.ic_favorite_outline)
-                viewModel.deleteEvent(dataEvent)
-            } else {
-                binding.fabFavorite.setImageResource(R.drawable.ic_favorite)
-                viewModel.saveEvent(dataEvent)
+            CoroutineScope(Dispatchers.IO).launch { // Launch a coroutine on the Main dispatcher
+                val event = dataEvent
+                if (event.isFavorite) {
+                    binding.fabFavorite.setImageResource(R.drawable.ic_favorite_outline)
+                    viewModel.deleteEvent(event) // Call the suspend function
+                } else {
+                    binding.fabFavorite.setImageResource(R.drawable.ic_favorite)
+                    viewModel.saveEvent(event) // Call the suspend function
+                }
             }
 
         }

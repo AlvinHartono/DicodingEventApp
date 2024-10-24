@@ -8,7 +8,7 @@ class FavoriteViewModel(private val eventRepository: EventRepository) : ViewMode
 
     fun getFavoriteEvents() = eventRepository.getFavoriteEvents()
 
-    fun saveEvent(event: Event) = eventRepository.setFavoriteEvents(event, true)
+    suspend fun saveEvent(event: Event) = eventRepository.setFavoriteEvents(event, true)
 
-    fun deleteEvent(event: Event) = eventRepository.setFavoriteEvents(event, false)
+    suspend fun deleteEvent(event:  Event) = eventRepository.setFavoriteEvents(event, false)
 }
