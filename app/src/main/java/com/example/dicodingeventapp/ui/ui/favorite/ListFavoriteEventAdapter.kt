@@ -7,12 +7,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.dicodingeventapp.R
 import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.ItemRowEventBBinding
 import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity
 
-class ListFavoriteEventAdapter(private val onFavoriteClick: (Event) -> Unit) :
+class ListFavoriteEventAdapter :
     ListAdapter<Event, ListFavoriteEventAdapter.EventFavoriteViewHolder>(DIFF_CALLBACK) {
 
 
@@ -53,17 +52,6 @@ class ListFavoriteEventAdapter(private val onFavoriteClick: (Event) -> Unit) :
     override fun onBindViewHolder(holder: EventFavoriteViewHolder, position: Int) {
         val event = getItem(position)
         holder.bind(event)
-
-        val isFavorite = holder.binding.imgFavoriteB
-        if (event.isFavorite) {
-            isFavorite.setImageResource(R.drawable.ic_favorite)
-        } else {
-            isFavorite.setImageResource(R.drawable.ic_favorite_outline)
-        }
-
-        isFavorite.setOnClickListener {
-            onFavoriteClick(event)
-        }
 
         holder.itemView.setOnClickListener {
             val intentDetailEvent =

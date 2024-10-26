@@ -1,7 +1,10 @@
 package com.example.dicodingeventapp.ui.detail_event
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -22,7 +25,7 @@ class DetailEventActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityDetailEventBinding
-    private val viewModel by viewModels<DetailEventActivityViewModel>{
+    private val viewModel by viewModels<DetailEventActivityViewModel> {
         DetailEventActivityViewModelFactory.getInstance(this)
     }
 
@@ -47,13 +50,19 @@ class DetailEventActivity : AppCompatActivity() {
         binding.tvEventNameDetail.text = dataEvent?.name
         binding.tvEventOwnerName.text = dataEvent?.ownerName
         binding.tvEventSummary.text = dataEvent?.summary
-        binding.tvEventSisaKuotaNumber.text = dataEvent?.registrants.toString()
+        binding.tvEventSisaKuotaNumber.text = (dataEvent?.registrants.let {
+            it?.let { it1 ->
+                dataEvent?.quota?.minus(
+                    it1
+                )
+            }
+        }).toString()
         binding.tvBeginTimeEvent.text = dataEvent?.beginTime
         binding.tvEventDescription.text = HtmlCompat.fromHtml(
             dataEvent?.description.toString(),
             HtmlCompat.FROM_HTML_MODE_LEGACY
         )
-        if (dataEvent!!.isFavorite){
+        if (dataEvent!!.isFavorite) {
             binding.fabFavorite.setImageResource(R.drawable.ic_favorite)
         } else {
             binding.fabFavorite.setImageResource(R.drawable.ic_favorite_outline)
@@ -62,6 +71,24 @@ class DetailEventActivity : AppCompatActivity() {
             .load(dataEvent.mediaCover)
             .into(binding.imageEventMediaCover)
 
+        binding.btnEventRegister.setOnClickListener {
+            when {
+                dataEvent.link.isEmpty() -> {
+                    Log.e("DetailEventActivity", "Event link is null or empty")
+                }
+
+                else -> {
+                    val webpage: Uri = Uri.parse(dataEvent.link)
+                    Log.d("DetailEventActivity", webpage.toString())
+                    val browserIntent = Intent(Intent.ACTION_VIEW, webpage)
+                    if (browserIntent.resolveActivity(packageManager) != null) {
+                        startActivity(browserIntent)
+                    } else {
+                        Log.e("DetailEventActivity", "No app found to open this URL")
+                    }
+                }
+            }
+        }
 
         binding.fabFavorite.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch { // Launch a coroutine on the Main dispatcher

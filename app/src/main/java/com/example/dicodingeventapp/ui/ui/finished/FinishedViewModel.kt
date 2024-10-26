@@ -53,15 +53,4 @@ class FinishedViewModel(private val eventRepository: EventRepository) : ViewMode
         }
     }
 
-    fun saveEvent(event: Event) {
-        viewModelScope.launch(Dispatchers.IO) {
-            eventRepository.setFavoriteEvents(event, true)
-        }
-    }
-
-    fun deleteEvent(event: Event) {
-        viewModelScope.launch(Dispatchers.IO) {
-            eventRepository.setFavoriteEvents(event, false)
-        }
-    }
 }

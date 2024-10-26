@@ -7,13 +7,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.dicodingeventapp.R
 import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.ItemRowEventBBinding
 import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity
 import com.example.dicodingeventapp.ui.detail_event.DetailEventActivity.Companion.EVENT_ITEM
 
-class ListUpcomingEventAdapter(private val onFavoriteClick: (Event) -> Unit) :
+class ListUpcomingEventAdapter :
     ListAdapter<Event, ListUpcomingEventAdapter.EventViewHolder>(DIFF_CALLBACK) {
     class EventViewHolder(val binding: ItemRowEventBBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -36,17 +35,6 @@ class ListUpcomingEventAdapter(private val onFavoriteClick: (Event) -> Unit) :
         val event = getItem(position)
 
         holder.bind(event)
-        val isFavorite = holder.binding.imgFavoriteB
-        if (event.isFavorite) {
-            isFavorite.setImageResource(R.drawable.ic_favorite)
-        } else {
-            isFavorite.setImageResource(R.drawable.ic_favorite_outline)
-        }
-
-        isFavorite.setOnClickListener {
-            onFavoriteClick(event)
-        }
-
         holder.itemView.setOnClickListener {
 
             val intentDetailEvent = Intent(holder.itemView.context, DetailEventActivity::class.java).apply {
@@ -69,7 +57,7 @@ class ListUpcomingEventAdapter(private val onFavoriteClick: (Event) -> Unit) :
                 oldItem: Event,
                 newItem: Event
             ): Boolean {
-                return oldItem == newItem
+                return  oldItem.isFavorite == newItem.isFavorite
             }
         }
     }

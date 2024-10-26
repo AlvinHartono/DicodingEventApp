@@ -22,8 +22,12 @@ interface EventDao {
     fun getFavoriteEvents(): LiveData<List<Event>>
 
     //get finished events
-    @Query("SELECT * FROM event WHERE isActive = 0")
+    @Query("SELECT * FROM event WHERE isActive = '0'")
     fun getFinishedEvents(): LiveData<List<Event>>
+
+    //get upcoming events
+    @Query("SELECT * FROM event WHERE isActive = 1")
+    fun getUpcomingEvents(): LiveData<List<Event>>
 
     @Query("SELECT EXISTS(SELECT * FROM event WHERE id = :id AND isFavorite = 1)")
     suspend fun isEventFavorite(id: Int?): Boolean

@@ -1,6 +1,7 @@
 package com.example.dicodingeventapp.ui.ui.search
 
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
@@ -18,6 +19,7 @@ class SearchActivity : AppCompatActivity() {
     private val searchViewModel by viewModels<SearchViewModel>{
         SearchViewModelFactory.getInstance(this)
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,13 +45,26 @@ class SearchActivity : AppCompatActivity() {
         }
 
         // Observe searched events
-        searchViewModel.searchedEvents.observe(this) { events ->
-            when (events) {
-                is Result.Error -> TODO()
-                Result.Loading -> showLoading(true)
+        searchViewModel.searchedEvents.observe(this) { result ->
+            Log.d("SearchActivity", "Received result: $result")
+            when (result) {
+                is Result.Error -> {
+                    showLoading(false)
+                    showError(true)
+                    //make recyclerview invisible
+                    binding.recyclerViewSearch.visibility = View.INVISIBLE
+
+                }
+                Result.Loading -> {
+                    showLoading(true)
+                    showError(false)
+                    binding.recyclerViewSearch.visibility = View.INVISIBLE
+                }
                 is Result.Success -> {
                     showLoading(false)
-                    setSearchEventsData(events.data)
+                    showError(false)
+                    setSearchEventsData(result.data)
+                    binding.recyclerViewSearch.visibility = View.VISIBLE
                 }
             }
         }
@@ -58,6 +73,7 @@ class SearchActivity : AppCompatActivity() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
+                    showError(false)
                     searchViewModel.fetchSearchResult(it)
                     binding.searchView.clearFocus()
                 }
@@ -68,6 +84,17 @@ class SearchActivity : AppCompatActivity() {
                 return false
             }
         })
+
+    }
+
+
+
+    private fun showError(error: Boolean) {
+        if (error) {
+            binding.tvNoEventFound.visibility = View.VISIBLE
+        } else {
+            binding.tvNoEventFound.visibility = View.GONE
+        }
     }
 
     // Handle Up button press

@@ -2,9 +2,9 @@
     <string name="app_name">DicodingEventApp</string>
     <string name="event_name">Event Name</string>
     <string name="title_activity_home">HomeActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+
+
+
     <string name="title_upcoming">Upcoming</string>
     <string name="title_finished">Finished</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse placerat augue id sem scelerisque, at blandit dolor iaculis. In volutpat vehicula magna a venenatis. Aliquam condimentum euismod nunc et fermentum. Praesent eros sem, vulputate non quam vitae, scelerisque luctus augue. Sed vel vehicula elit. Aliquam vitae erat non lectus iaculis vehicula. Aenean vel lorem egestas, consequat purus at, placerat lorem. Aliquam urna mi, gravida vitae tempus eget, rhoncus eget neque.</string>
@@ -15,24 +15,21 @@
     <string name="event_summary">Event Summary</string>
     <string name="sisa_kuota">Sisa Kuota:</string>
     <string name="_1337">1337</string>
-    <string name="event_start">2024-10-11 17:00:00</string>
-    <string name="informasi">Informasi:</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="home">Home</string>
+    <string name="event_start">17:00:00</string>
     <string name="dicoding_event">Dicoding Event</string>
     <string name="recommendation_event_for_you">Recommendation event for you!</string>
-    <string name="upcoming_events">Upcoming Events</string>
     <string name="search_bar_upcoming_event_hint">Cari event yang sedang berlangsung</string>
     <string name="search">Search</string>
     <string name="image_logo">Image Logo</string>
     <string name="events_that_have_finished">Events that have finished</string>
     <string name="devcoach">Devcoach</string>
-    <string name="finished_events">Finished Events</string>
     <string name="favorite_event">Favorite Event</string>
     <string name="favorite">Favorite</string>
     <string name="settings">Settings</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="daily_reminder">Daily Reminder</string>
     <string name="belum_ada_event_yang_kamu_favoritkan">Belum ada event yang kamu favoritkan.</string>
+    <string name="upcoming_no_event_found">Tidak ada event yang akan berlangsung</string>
+    <string name="event_media_cover">Event Media Cover</string>
+    <string name="tidak_ada_event_dengan_kata_kunci_yang_anda_cari">Tidak ada event dengan kata kunci yang Anda cari</string>
 </resources>

@@ -10,14 +10,13 @@ import android.widget.Toast
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.dicodingeventapp.data.Result
 import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.FragmentFinishedBinding
 import com.example.dicodingeventapp.ui.ui.search.SearchActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -59,7 +58,6 @@ class FinishedFragment : Fragment() {
 
         // Searchbar goes to SearchFragment when clicked
         binding.searchBar.setOnClickListener {
-//            TODO: make an intent to SearchActivity
             val intent = Intent(requireContext(), SearchActivity::class.java)
             startActivity(intent)
         }
@@ -88,17 +86,15 @@ class FinishedFragment : Fragment() {
             showLoading(it)
         }
 
-        CoroutineScope(Dispatchers.Main).launch {
+        viewLifecycleOwner.lifecycleScope.launch {
+            // check which thread is used
+            Log.d("FinishedFragment Thread", "Thread: ${Thread.currentThread().name}")
             finishedViewModel.fetchFinishedEvents()
         }
 
         return root
     }
 
-    private fun showError(message: String) {
-        Toast.makeText(requireContext(), "Error: $message", Toast.LENGTH_SHORT).show()
-        Log.e("UpcomingFragment", "Error: $message")
-    }
 
     private fun showLoading(isLoading: Boolean) {
         if (isLoading) {
@@ -109,14 +105,13 @@ class FinishedFragment : Fragment() {
 
     }
 
+    private fun showError(message: String) {
+        Toast.makeText(requireContext(), "Error: $message", Toast.LENGTH_SHORT).show()
+        Log.e("UpcomingFragment", "Error: $message")
+    }
+
     private fun setFinishedEventsData(events: List<Event?>?) {
-        val adapter = ListFinishedEventAdapter { event ->
-            if (event.isFavorite) {
-                finishedViewModel.deleteEvent(event)
-            } else {
-                finishedViewModel.saveEvent(event)
-            }
-        }
+        val adapter = ListFinishedEventAdapter()
         adapter.submitList(events)
         binding.rvEvent.adapter = adapter
     }

@@ -1,5 +1,6 @@
 package com.example.dicodingeventapp.ui.ui.search
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -20,17 +21,45 @@ class SearchViewModel(private val eventRepository: EventRepository) : ViewModel(
 
 
     fun fetchSearchResult(query: String) {
-        _searchedEvents.postValue(Result.Loading)
-        _isLoading.postValue(true)
+        viewModelScope.launch(Dispatchers.Main) {
+            Log.d("SearchViewModel", "Fetching search result for query: $query")
 
-        viewModelScope.launch(Dispatchers.IO) {
+            _searchedEvents.postValue(Result.Loading)
+            _isLoading.postValue(true)
+
             try {
+                Log.d("SearchViewModel", "Fetching search result for query: $query")
                 val response = eventRepository.fetchSearchResult(query)
-                _searchedEvents.postValue(response.value)
-                _isLoading.postValue(false)
+                Log.d("SearchViewModel", "Search result fetched: ${response.value}")
+                when (response.value) {
+                    is Result.Error -> {
+                        Log.e("SearchViewModel", "Error fetching search result: ${response.value}")
+
+                        _searchedEvents.postValue(Result.Error("No events found"))
+                        _isLoading.postValue(false)
+                    }
+
+                    Result.Loading -> {
+                        Log.d("SearchViewModel", "Loading...")
+                    }
+
+                    is Result.Success -> {
+                        _searchedEvents.postValue(response.value)
+                        _isLoading.postValue(false)
+                        Log.d("SearchViewModel", "Success fetching search result: ${response.value}")
+                    }
+
+                    null -> {
+                        _searchedEvents.postValue(Result.Error("No events found"))
+                        _isLoading.postValue(false)
+                        Log.d("SearchViewModel", "No events found")
+                    }
+                }
             } catch (e: Exception) {
                 _searchedEvents.postValue(Result.Error(e.message.toString()))
                 _isLoading.postValue(false)
+                Log.e("SearchViewModel", "Error fetching search result: ${e.message}")
+
             }
         }
     }

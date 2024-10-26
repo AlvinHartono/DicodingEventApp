@@ -36,15 +36,13 @@ class UpcomingViewModel(private val eventRepository: EventRepository) : ViewMode
                         _isLoading.postValue(false)
                     }
 
-                    is Result.Loading -> {
-                        _upcomingEvents.postValue(Result.Loading)
+                    Result.Loading -> {
                         Log.d("UpcomingViewModel", "Upcoming events are still loading")
                     }
 
                     else -> {
                         _upcomingEvents.postValue(Result.Error("Failed to fetch upcoming events: ${response.value}"))
                         Log.e("UpcomingViewModel", "Failed to fetch upcoming events: ${response.value}")
-                        _isLoading.postValue(false)
                     }
                 }
             } catch (e: Exception) {
@@ -55,15 +53,4 @@ class UpcomingViewModel(private val eventRepository: EventRepository) : ViewMode
     }
 
 
-    fun saveEvent(event: Event) {
-        viewModelScope.launch(Dispatchers.IO) {
-            eventRepository.setFavoriteEvents(event, true)
-        }
-    }
-
-    fun deleteEvent(event: Event) {
-        viewModelScope.launch(Dispatchers.IO) {
-            eventRepository.setFavoriteEvents(event, false)
-        }
-    }
 }

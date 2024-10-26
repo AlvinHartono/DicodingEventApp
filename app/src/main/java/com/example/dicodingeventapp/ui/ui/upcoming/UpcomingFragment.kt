@@ -10,14 +10,13 @@ import android.widget.Toast
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dicodingeventapp.data.Result
 import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.FragmentUpcomingBinding
 import com.example.dicodingeventapp.ui.ui.search.SearchActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class UpcomingFragment : Fragment() {
@@ -58,7 +57,6 @@ class UpcomingFragment : Fragment() {
         })
         // Searchbar goes to SearchFragment when clicked
         binding.searchBar.setOnClickListener {
-//            TODO: make an intent to SearchActivity
             val intent = Intent(requireContext(), SearchActivity::class.java)
             startActivity(intent)
         }
@@ -77,11 +75,13 @@ class UpcomingFragment : Fragment() {
             }
         }
 
-        upcomingViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            showLoading(isLoading)
+        upcomingViewModel.isLoading.observe(viewLifecycleOwner) {
+            showLoading(it)
         }
 
-        CoroutineScope(Dispatchers.Main).launch {
+        viewLifecycleOwner.lifecycleScope.launch {
+            // check which thread is used
+            Log.d("UpcomingFragment Thread", "Thread: ${Thread.currentThread().name}")
             upcomingViewModel.fetchUpcomingEvents()
         }
 
@@ -98,23 +98,22 @@ class UpcomingFragment : Fragment() {
     }
 
     private fun showError(message: String) {
-        // Handle error display, e.g., with a Toast or Snack bar
         Toast.makeText(requireContext(), "Error: $message", Toast.LENGTH_SHORT).show()
         Log.e("UpcomingFragment", "Error: $message")
     }
 
     private fun setUpcomingEventsData(events: List<Event?>?) {
-        val adapter = ListUpcomingEventAdapter {
-            if (it.isFavorite) {
-                upcomingViewModel.deleteEvent(it)
-            } else {
-                upcomingViewModel.saveEvent(it)
-            }
+        if (events.isNullOrEmpty()) {
+            binding.tvNoEventFound.visibility = View.VISIBLE
+            binding.rvEvent.visibility = View.INVISIBLE
+        } else {
+            val adapter = ListUpcomingEventAdapter()
+            binding.tvNoEventFound.visibility = View.INVISIBLE
+            binding.rvEvent.visibility = View.VISIBLE
+            adapter.submitList(events)
+            binding.rvEvent.adapter = adapter
         }
-        adapter.submitList(events)
-        binding.rvEvent.adapter = adapter
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

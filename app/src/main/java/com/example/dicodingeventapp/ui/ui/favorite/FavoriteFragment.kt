@@ -10,9 +10,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dicodingeventapp.data.local.entity.Event
 import com.example.dicodingeventapp.databinding.FragmentFavoriteBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class FavoriteFragment : Fragment() {
@@ -55,15 +52,7 @@ class FavoriteFragment : Fragment() {
             binding.rvFavorite.visibility = View.VISIBLE
             binding.tvEmptyFavorite.visibility = View.INVISIBLE
 
-            val adapter = ListFavoriteEventAdapter { event ->
-                CoroutineScope(Dispatchers.Main).launch {
-                    if (event.isFavorite) {
-                        favoriteViewModel.deleteEvent(event) // Call the suspend function
-                    } else {
-                        favoriteViewModel.saveEvent(event) // Call the suspend function
-                    }
-                }
-            }
+            val adapter = ListFavoriteEventAdapter()
 
             adapter.submitList(events)
             binding.rvFavorite.adapter = adapter

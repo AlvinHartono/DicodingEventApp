@@ -67,13 +67,19 @@ class EventRepository private constructor(
                     Log.d("EventRepository", "Finished Event list size: ${eventList.size}")
                 }
                 eventDao.insertEvents(eventList)
-                Log.d("EventRepository", "Events inserted into local DB")
+
                 finishedResult.postValue(Result.Success(eventList))
+                Log.d(
+                    "EventRepository",
+                    "Finished events fetched successfully ${finishedResult.value}"
+                )
             } else {
                 finishedResult.postValue(Result.Error("No events found"))
+                Log.d("EventRepository", "No events found")
             }
         } catch (e: Exception) {
             finishedResult.postValue(Result.Error("Failed to fetch finished events: ${e.message}"))
+            Log.e("EventRepository", "Failed to fetch finished events: ${e.message}")
         }
         return finishedResult
     }
@@ -128,54 +134,80 @@ class EventRepository private constructor(
 
 
                 upcomingResult.postValue(Result.Success(eventList))
+                Log.d(
+                    "EventRepository",
+                    "Upcoming events fetched successfully ${finishedResult.value}"
+                )
 
             } else {
                 // Handle case when event list is empty or null
                 upcomingResult.postValue(Result.Error("No events found"))
                 Log.d("EventRepository", "No events found")
+
             }
 
         } catch (e: Exception) {
             // Post the error result in case of an exception
             upcomingResult.postValue(Result.Error("Failed to fetch upcoming events: ${e.message}"))
         }
-
         return upcomingResult
     }
 
 
     // fetch the search result from the api
     suspend fun fetchSearchResult(query: String): MutableLiveData<Result<List<Event>>> {
-        searchResult.value = Result.Loading
-        val response = apiService.findEvents(ALL_EVENTS, query)
-        val events = response.listEvents
-        val eventList = ArrayList<Event>()
-        if (events!!.isNotEmpty()) {
-            events.forEach { event ->
-                val isFavorite = eventDao.isEventFavorite(event?.id)
-                val eventEntity = Event(
-                    name = event?.name ?: "",
-                    id = event?.id ?: 0,
-                    summary = event?.summary ?: "",
-                    mediaCover = event?.mediaCover ?: "",
-                    registrants = event?.registrants ?: 0,
-                    imageLogo = event?.imageLogo ?: "",
-                    link = event?.link ?: "",
-                    description = event?.description ?: "",
-                    ownerName = event?.ownerName ?: "",
-                    cityName = event?.cityName ?: "",
-                    quota = event?.quota ?: 0,
-                    beginTime = event?.beginTime ?: "",
-                    endTime = event?.endTime ?: "",
-                    category = event?.category ?: "",
-                    isFavorite = isFavorite,
-                    isActive = isEventActive(event?.beginTime),
-                )
-                eventList.add(eventEntity)
+        Log.d("EventRepository", "Fetching search result for query: $query")
+        searchResult.postValue(Result.Loading)
+//        try {
+            Log.d("EventRepository", "Fetching search result for query: $query")
+            val response = apiService.findEvents(ALL_EVENTS, query)
+            Log.d(
+                "EventRepository",
+                "Search result fetched from API: ${response.listEvents?.size} and has data? ${!response.listEvents.isNullOrEmpty()}"
+            )
+            val events = response.listEvents
+            Log.d("EventRepository", "Search result fetched successfully")
+            if (events!!.isNotEmpty()) {
+                Log.d("EventRepository", "Search events is not empty")
+                val eventList = ArrayList<Event>()
+                events.forEach { event ->
+                    val isFavorite = eventDao.isEventFavorite(event?.id)
+                    val eventEntity = Event(
+                        name = event?.name ?: "",
+                        id = event?.id ?: 0,
+                        summary = event?.summary ?: "",
+                        mediaCover = event?.mediaCover ?: "",
+                        registrants = event?.registrants ?: 0,
+                        imageLogo = event?.imageLogo ?: "",
+                        link = event?.link ?: "",
+                        description = event?.description ?: "",
+                        ownerName = event?.ownerName ?: "",
+                        cityName = event?.cityName ?: "",
+                        quota = event?.quota ?: 0,
+                        beginTime = event?.beginTime ?: "",
+                        endTime = event?.endTime ?: "",
+                        category = event?.category ?: "",
+                        isFavorite = isFavorite,
+                        isActive = isEventActive(event?.beginTime),
+                    )
+                    Log.d("EventRepository", "Event added to list: ${eventEntity.id}")
+                    eventList.add(eventEntity)
+                    Log.d("EventRepository", "Event list size: ${eventList.size}")
+                }
+//                eventDao.insertEvents(eventList)
                 searchResult.value = Result.Success(eventList)
+                Log.d(
+                    "EventRepository",
+                    "Search result fetched successfullys ${searchResult.value}"
+                )
+            } else {
+                searchResult.value = Result.Error("No events found")
+                Log.d("EventRepository", "No events found")
             }
-        }
-
+//        } catch (e: Exception) {
+//            searchResult.postValue(Result.Error("Failed to fetch search result: ${e.message}"))
+//            Log.e("EventRepository", "Failed to fetch search result: ${e.message}")
+//        }
         return searchResult
     }
 

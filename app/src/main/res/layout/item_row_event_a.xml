@@ -28,18 +28,6 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic" />
 
-        <ImageView
-            android:id="@+id/img_favorite_a"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:contentDescription="@string/favorite_event"
-            android:src="@drawable/ic_favorite_outline"
-            android:tag="Not Favorite"
-            app:layout_constraintStart_toStartOf="@id/img_event_image_logo"
-            app:layout_constraintTop_toTopOf="@id/img_event_image_logo" />
-
         <TextView
             android:id="@+id/tv_event_name"
             android:layout_width="match_parent"
